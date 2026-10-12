@@ -1,0 +1,75 @@
+diff --git a/app/composeApp/src/commonMain/kotlin/app/ui/Sections.kt b/app/composeApp/src/commonMain/kotlin/app/ui/Sections.kt
+index 8cc7bac..1a40ce2 100644
+--- a/app/composeApp/src/commonMain/kotlin/app/ui/Sections.kt
++++ b/app/composeApp/src/commonMain/kotlin/app/ui/Sections.kt
+@@ -26,12 +26,10 @@ import androidx.compose.foundation.layout.width
+ import androidx.compose.foundation.layout.widthIn
+ import androidx.compose.foundation.lazy.LazyListScope
+ import androidx.compose.foundation.lazy.items
++import androidx.compose.foundation.selection.selectable
+ import androidx.compose.foundation.shape.RoundedCornerShape
+ import androidx.compose.foundation.text.BasicTextField
+-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+ import androidx.compose.material3.Text
+-import androidx.compose.material3.ToggleButton
+-import androidx.compose.material3.ToggleButtonDefaults
+ import androidx.compose.runtime.Composable
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
+@@ -43,6 +41,7 @@ import androidx.compose.ui.graphics.Brush
+ import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.graphics.SolidColor
+ import androidx.compose.ui.graphics.StrokeCap
++import androidx.compose.ui.semantics.Role
+ import androidx.compose.ui.text.TextStyle
+ import androidx.compose.ui.text.style.TextAlign
+ import androidx.compose.ui.unit.Dp
+@@ -685,30 +684,31 @@ private fun SettingRow(
+ }
+ 
+ /**
+- * A single option in a [SettingRow]. Material 3 Expressive's [ToggleButton]: the shape morphs
+- * under the press and squares off once checked, which the design's static pill could not do.
+- * The colours stay the luach's.
++ * A single option in a [SettingRow]: a pill that fills with the accent once selected. Built from
++ * foundation parts on purpose: Material's expressive `ToggleButton` is experimental and its colours
++ * API is not the same in the Android and Compose Multiplatform artifacts.
+  */
+-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+ @Composable
+ private fun Segment(label: String, selected: Boolean, onClick: () -> Unit) {
+     val colors = LuachTheme.colors
+     val fonts = LuachTheme.fonts
++    val shape = RoundedCornerShape(50)
+ 
+-    ToggleButton(
+-        checked = selected,
+-        onCheckedChange = { onClick() },
+-        colors = ToggleButtonDefaults.toggleButtonColors(
+-            containerColor = Color.Transparent,
+-            contentColor = colors.muted,
+-            checkedContainerColor = colors.goldSoft,
+-            checkedContentColor = colors.gold,
+-        ),
+-        elevation = null,
+-        border = BorderStroke(1.dp, if (selected) colors.gold else colors.line),
+-        contentPadding = PaddingValues(horizontal = 15.dp, vertical = 9.dp),
++    Box(
++        modifier = Modifier
++            .clip(shape)
++            .background(if (selected) colors.goldSoft else Color.Transparent)
++            .border(1.dp, if (selected) colors.gold else colors.line, shape)
++            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
++            .padding(horizontal = 15.dp, vertical = 9.dp),
++        contentAlignment = Alignment.Center,
+     ) {
+-        Text(label, fontFamily = fonts.body, fontSize = 13.sp)
++        Text(
++            label,
++            fontFamily = fonts.body,
++            fontSize = 13.sp,
++            color = if (selected) colors.gold else colors.muted,
++        )
+     }
+ }
+ 
