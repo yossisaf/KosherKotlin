@@ -1,0 +1,76 @@
+diff --git a/app/androidApp/src/main/AndroidManifest.xml b/app/androidApp/src/main/AndroidManifest.xml
+index 987ee4a..771444c 100644
+--- a/app/androidApp/src/main/AndroidManifest.xml
++++ b/app/androidApp/src/main/AndroidManifest.xml
+@@ -3,7 +3,8 @@
+ 
+     <application
+             android:icon="@android:mipmap/sym_def_app_icon"
+-            android:label="Luach"
++            android:label="לוח"
++            android:supportsRtl="true"
+             android:theme="@android:style/Theme.Material.NoActionBar">
+         <activity
+             android:name="app.AppActivity"
+diff --git a/app/androidApp/src/main/kotlin/app/main.kt b/app/androidApp/src/main/kotlin/app/main.kt
+index 83634e9..4379760 100644
+--- a/app/androidApp/src/main/kotlin/app/main.kt
++++ b/app/androidApp/src/main/kotlin/app/main.kt
+@@ -9,6 +9,6 @@ class AppActivity : ComponentActivity() {
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+         enableEdgeToEdge()
+-        setContent { App() }
++        setContent { AndroidApp() }
+     }
+ }
+diff --git a/app/composeApp/src/androidMain/kotlin/app/AndroidApp.kt b/app/composeApp/src/androidMain/kotlin/app/AndroidApp.kt
+new file mode 100644
+index 0000000..e8c01d5
+--- /dev/null
++++ b/app/composeApp/src/androidMain/kotlin/app/AndroidApp.kt
+@@ -0,0 +1,16 @@
++package app
++
++import androidx.compose.foundation.layout.WindowInsets
++import androidx.compose.foundation.layout.asPaddingValues
++import androidx.compose.foundation.layout.statusBars
++import androidx.compose.runtime.Composable
++
++/**
++ * The Android entry point. The activity draws edge to edge, so the status bar overlaps the top of
++ * the window; its height is handed to [App] as the inset the nav strip and page headers clear.
++ * (The bottom inset is handled inside the lists themselves.)
++ */
++@Composable
++fun AndroidApp() {
++    App(topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
++}
+diff --git a/app/composeApp/src/commonMain/kotlin/app/ui/LuachScreen.kt b/app/composeApp/src/commonMain/kotlin/app/ui/LuachScreen.kt
+index cbde0ac..1520747 100644
+--- a/app/composeApp/src/commonMain/kotlin/app/ui/LuachScreen.kt
++++ b/app/composeApp/src/commonMain/kotlin/app/ui/LuachScreen.kt
+@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.Box
+ import androidx.compose.foundation.layout.BoxWithConstraints
+ import androidx.compose.foundation.layout.Column
+ import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.WindowInsets
++import androidx.compose.foundation.layout.asPaddingValues
++import androidx.compose.foundation.layout.navigationBars
+ import androidx.compose.foundation.layout.Spacer
+ import androidx.compose.foundation.layout.fillMaxHeight
+ import androidx.compose.foundation.layout.fillMaxSize
+@@ -171,7 +174,12 @@ private fun SectionPage(
+     Box(Modifier.fillMaxSize()) {
+         // Only the hero draws under the rail; every other page starts where the rail ends.
+         val start = if (section == LuachSection.NOW) 0.dp else railInset
+-        LazyColumn(Modifier.fillMaxSize().padding(start = start), state = listState) {
++        LazyColumn(
++            Modifier.fillMaxSize().padding(start = start),
++            state = listState,
++            // Keep the last row clear of the system navigation bar (zero on desktop and web).
++            contentPadding = WindowInsets.navigationBars.asPaddingValues(),
++        ) {
+             if (section == LuachSection.NOW) {
+                 // The landing page is the hero and nothing else: it takes the whole window,
+                 // and only scrolls when the window is too short to hold it.
