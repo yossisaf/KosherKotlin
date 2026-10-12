@@ -16,7 +16,7 @@ vanniktech-maven-publish = "0.37.0"
 android-compileSdk = "37"
 android-minSdk = "21"
 # compose-resources 1.12 requires 23; the published :zmanim library stays at 21.
-android-appMinSdk = "23"
+android-appMinSdk = "24"
 android-targetSdk = "37"
 js-joda-timezone = "2.25.2"
 metro = "1.4.5"
